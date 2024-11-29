@@ -5,7 +5,6 @@ import com.es.jwtsecurity.model.Usuario;
 import com.es.jwtsecurity.repository.UsuarioRepository;
 import com.es.jwtsecurity.security.SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

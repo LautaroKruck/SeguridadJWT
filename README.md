@@ -21,7 +21,7 @@ Se trabajará con las siguientes tres entidades:
    - `id` (Long): Identificador único del producto.
    - `nombre` (String): Nombre del producto.
    - `stock` (int): Cantidad disponible del producto.
-   - `precio` (boolean): Indicador de si el producto tiene un precio válido o no.
+   - `precio` (double): Indicador de si el producto tiene un precio válido o no.
 
 ---
 
@@ -81,7 +81,7 @@ Se trabajará con las siguientes tres entidades:
    - `POST /productos`: Permite insertar un nuevo producto.
       - *SÓLO ADMIN*: Sólo los usuarios con ROL ADMIN pueden acceder a este recurso
       - **Entrada**: JSON con `nombre`, `stock`, y `precio`.
-   - `DELETE /productos`: Permite insertar un nuevo producto.
+   - `DELETE /productos/{id}`: Permite insertar un nuevo producto.
       - *SÓLO ADMIN*: Sólo los usuarios con ROL ADMIN pueden acceder a este recurso
       - **Entrada**: JSON con `nombre`, `stock`, y `precio`.
 

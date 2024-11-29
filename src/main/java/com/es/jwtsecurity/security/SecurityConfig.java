@@ -10,6 +10,7 @@ import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -48,10 +49,20 @@ public class SecurityConfig {
 
         return http
                 .csrf(csrf -> csrf.disable()) // Deshabilitamos "Cross-Site Request Forgery" (CSRF) (No lo trataremos en este ciclo)
-                .authorizeHttpRequests(auth -> auth // Filtros para securizar diferentes endpoints de la aplicación
-                        .requestMatchers("/usuarios/login", "/usuarios/register").permitAll() // Filtro que deja pasar todas las peticiones que vayan a los endpoints que definamos
-                        .requestMatchers("/ruta_protegida/**").authenticated()
-                        .anyRequest().authenticated() // Para el resto de peticiones, el usuario debe estar autenticado
+                .authorizeHttpRequests(auth -> auth
+                        // Endpoints públicos
+                        .requestMatchers("/usuarios/login", "/usuarios/register").permitAll()
+
+                        // Endpoints protegidos por roles
+                        .requestMatchers(HttpMethod.GET, "/productos/").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/productos/").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/productos/").hasRole("ADMIN")
+
+                        // Acceso restringido a "/usuarios/{nombre}" según condiciones
+                        .requestMatchers(HttpMethod.GET, "/usuarios/{nombre}").hasRole("ADMIN")
+
+                        // Para el resto, requiere autenticación
+                        .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults())) // Establecemos el que el control de autenticación se realice por JWT
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

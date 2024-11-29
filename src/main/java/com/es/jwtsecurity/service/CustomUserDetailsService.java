@@ -3,7 +3,9 @@ package com.es.jwtsecurity.service;
 import com.es.jwtsecurity.dto.UsuarioRegisterDTO;
 import com.es.jwtsecurity.model.Usuario;
 import com.es.jwtsecurity.repository.UsuarioRepository;
+import com.es.jwtsecurity.security.SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,17 +13,34 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-// es el user service
-
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
+    /**
+     * usuarioRepository es un objeto de tipo {@link UsuarioRepository}
+     * La instanciación del objeto usuarioRepository viene inyectada automáticamente por Spring Boot
+     */
     @Autowired
     private UsuarioRepository usuarioRepository;
+    /**
+     * passwordEncoder es un objeto de tipo {@link PasswordEncoder}
+     * ¿De dónde sale la inicialización de este objeto?
+     * La inicialización de este objeto viene dada en la clase {@link SecurityConfig},
+     * más concretamente en el método {@link SecurityConfig#passwordEncoder()}
+     */
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-
+    /**
+     * ¡IMPORTANTE!
+     * SpringSecurity necesita que implementemos la interfaz {@link UserDetailsService}.
+     * La interfaz UsersDetailsService contiene un único método {@link UserDetailsService#loadUserByUsername(String)}
+     * El método loadUserByUsername busca en la base de datos al usuario por su userName.
+     * Con este método, SpringSecurity tendría toda la configuración necesaria para poder gestionar nuestros Usuarios
+     * @param username the username identifying the user whose data is required.
+     * @return
+     * @throws UsernameNotFoundException
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
@@ -45,6 +64,11 @@ public class CustomUserDetailsService implements UserDetailsService {
         return userDetails;
     }
 
+    /**
+     * Método para registrar un nuevo Usuario en la BDD
+     * @param usuarioRegisterDTO
+     * @return
+     */
     public UsuarioRegisterDTO registerUser(UsuarioRegisterDTO usuarioRegisterDTO) {
         // Comprobamos que el usuario no existe en la base de datos
         if (usuarioRepository.findByUsername(usuarioRegisterDTO.getUsername()).isPresent()) {

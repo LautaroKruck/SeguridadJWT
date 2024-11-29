@@ -1,11 +1,8 @@
 package com.es.jwtsecurity.service;
 
-import com.nimbusds.jwt.JWTClaimsSet;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
@@ -18,16 +15,20 @@ import java.util.stream.Collectors;
 @Service
 public class TokenService {
 
+    /*
+    EN ESTA CLASE SE VA A REALIZAR LA GENERACIÓN DEL TOKEN
+    - VAMOS A CONSTRUIR UN HEADER
+    - UN PAYLOAD
+    - Y A FIRMARLO (con el jwtEncoder)
+     */
+
     @Autowired
     private JwtEncoder jwtEncoder;
 
     public String generateToken(Authentication authentication) {
-
         Instant now = Instant.now();
 
-        String roles = authentication
-                .getAuthorities()
-                .stream()
+        String roles = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));
 
@@ -36,11 +37,9 @@ public class TokenService {
                 .issuedAt(now)
                 .expiresAt(now.plus(1, ChronoUnit.HOURS))
                 .subject(authentication.getName())
-                .notBefore(now.plus(30,ChronoUnit.SECONDS))
                 .claim("roles", roles)
                 .build();
 
-        return jwtEncoder.encode((JwtEncoderParameters.from(claims))).getTokenValue();
+        return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
-
 }

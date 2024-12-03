@@ -1,5 +1,6 @@
 package com.es.jwtsecurity.controller;
 
+import com.es.jwtsecurity.dto.UsuarioDTO;
 import com.es.jwtsecurity.dto.UsuarioLoginDTO;
 import com.es.jwtsecurity.dto.UsuarioRegisterDTO;
 import com.es.jwtsecurity.service.CustomUserDetailsService;
@@ -11,10 +12,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -106,4 +105,21 @@ public class UsuarioController {
 
     }
 
+    @GetMapping("/byNombre/{nombre}")
+    public ResponseEntity<UsuarioDTO> findByNombre(@PathVariable String nombre, Authentication authentication) {
+
+        System.out.println(authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.equals(new SimpleGrantedAuthority("ROLE_ADMIN"))));
+
+        if(authentication.getAuthorities()
+                .stream()
+                .anyMatch(authority -> authority.equals(new SimpleGrantedAuthority("ROLE_ADMIN"))) || authentication.getName().equals(nombre)) {
+            UsuarioDTO usuarioDTO = customUserDetailsService.findByNombre(nombre);
+            return new ResponseEntity<>(usuarioDTO, HttpStatus.OK);
+        } else {
+            System.out.println("No tienes los permisos para acceder al recurso");
+            return null;
+        }
+
+    }
 }

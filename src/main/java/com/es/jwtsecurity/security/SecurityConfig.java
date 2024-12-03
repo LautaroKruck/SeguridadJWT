@@ -59,7 +59,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/productos/").hasRole("ADMIN")
 
                         // Acceso restringido a "/usuarios/{nombre}" según condiciones
-                        .requestMatchers(HttpMethod.GET, "/usuarios/{nombre}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/usuarios/{nombre}").authenticated()
 
                         // Para el resto, requiere autenticación
                         .anyRequest().authenticated()

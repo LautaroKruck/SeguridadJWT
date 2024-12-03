@@ -1,10 +1,12 @@
 package com.es.jwtsecurity.service;
 
+import com.es.jwtsecurity.dto.UsuarioDTO;
 import com.es.jwtsecurity.dto.UsuarioRegisterDTO;
 import com.es.jwtsecurity.model.Usuario;
 import com.es.jwtsecurity.repository.UsuarioRepository;
 import com.es.jwtsecurity.security.SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -90,5 +92,15 @@ public class CustomUserDetailsService implements UserDetailsService {
         usuarioRepository.save(newUsuario);
 
         return usuarioRegisterDTO;
+    }
+
+    public UsuarioDTO findByNombre(String nombre) {
+
+        Usuario u = usuarioRepository
+                .findByUsername(nombre)
+                .orElseThrow(() -> new ChangeSetPersister.NotFoundException("Usuario con nombre "+nombre+" no encontrado"));
+
+        return usuarioMapper.entityToDto(u);
+
     }
 }
